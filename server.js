@@ -84,7 +84,16 @@ app.get('/givenDay/:day',(req,res) =>{
     .then(async (logs) =>{
         let duration = 0;
         let users = [];
-        logs.forEach(log => users.push(log.user));
+        logs.forEach(log =>{
+            if(log.timeStamp.getDay() === parseInt(req.params.day)){
+                users.push(log.user);
+            }
+        });
+        console.log(users);
+        if(users.length === 0){
+            duration = "Total Duration is 0 sec";
+            res.send({duration});
+        }
         users = uniq(users);
         let prom = new Promise((resolve,reject) =>{
             users.forEach(async (user,index) =>{
@@ -92,20 +101,22 @@ app.get('/givenDay/:day',(req,res) =>{
                 await ReadingLog.find({user})
                 .then(logs =>{
                     logs.forEach(log =>{
-                        if(log.event_type === "start"){
-                            start = log.timeStamp;
-                            console.log(`start found = ${start}`);
-                        } else {
-                            end = log.timeStamp;
-                            console.log(`end found = ${end}`);
+                        if(log.timeStamp.getDay() === parseInt(req.params.day)){
+                            if(log.event_type === "start"){
+                                start = log.timeStamp;
+                                console.log(`start found = ${start}`);
+                            } else {
+                                end = log.timeStamp;
+                                console.log(`end found = ${end}`);
+                            }
+                            if(start && end){
+                                console.log("start and end");
+                                duration += (end-start);
+                                console.log(duration);
+                                start = 0;
+                                end = 0;
+                            }    
                         }
-                        if(start && end){
-                            console.log("start and end");
-                            duration += (end-start);
-                            console.log(duration);
-                            start = 0;
-                            end = 0;
-                        }    
                     })
                 })
                 if(index === users.length-1){
