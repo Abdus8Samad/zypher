@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zypher Assign</title>
+</head>
+<body>
+    <form action="/addUser" method="post">
+        <h2>Create User</h2>
+        <hr />
+        <input type="text" name="username" id="username" placeholder="Username" />
+        <button>Add User</button>
+    </form>
+    <form action="/addBook" method="post">
+        <h2>Create Book</h2>
+        <hr />
+        <input type="text" name="bookName" id="bookName" placeholder="BookName" />
+        <input type="text" name="author" id="author" placeholder="Author" />
+        <button>Add Book</button>
+    </form>
+    <form action="/openBook" method="POST">
+        <h2>Open Book</h2>
+        <hr />
+        <h3>User:</h3>
+        <input type="text" name="username" id="username" placeholder="username" required/>
+        <h3>Book:</h3>
+        <input type="text" name="bookName" id="bookName" placeholder="Bookname" required/>
+        <button>Open Book</button>
+    </form>
+    <form action="/closeBook" method="POST">
+        <h2>Close Book</h2>
+        <hr />
+        <h3>User:</h3>
+        <input type="text" name="username2" id="username" placeholder="username" required/>
+        <h3>Book:</h3>
+        <input type="text" name="bookName" id="bookName" placeholder="Bookname" required/>
+        <button>Close Book</button>
+    </form>
+</body>
+</html>
