@@ -86,28 +86,44 @@ app.get('/givenDay/:day',(req,res) =>{
         let users = [];
         logs.forEach(log => users.push(log.user));
         users = uniq(users);
-        await users.forEach(async (user) =>{
-            let start = 0,end = 0;
-            await ReadingLog.find({user})
-            .then(logs =>{
-                logs.forEach(log =>{
-                    if(log.event_type === "start"){
-                        start = log.timeStamp;
-                        console.log(`start found = ${start}`);
-                    } else {
-                        end = log.timeStamp;
-                        console.log(`end found = ${end}`);
-                    }
-                    if(start && end){
-                        console.log("start and end");
-                        duration += (end-start);
-                        console.log(duration);
-                        start = 0;
-                        end = 0;
-                    }    
+        let prom = new Promise((resolve,reject) =>{
+            users.forEach(async (user,index) =>{
+                let start = 0,end = 0;
+                await ReadingLog.find({user})
+                .then(logs =>{
+                    logs.forEach(log =>{
+                        if(log.event_type === "start"){
+                            start = log.timeStamp;
+                            console.log(`start found = ${start}`);
+                        } else {
+                            end = log.timeStamp;
+                            console.log(`end found = ${end}`);
+                        }
+                        if(start && end){
+                            console.log("start and end");
+                            duration += (end-start);
+                            console.log(duration);
+                            start = 0;
+                            end = 0;
+                        }    
+                    })
                 })
-            })
+                if(index === users.length-1){
+                    return resolve();
+                }
+            })    
         })
+        await prom;
+        let hrs = Math.round(duration/(1000*60*60));
+        let mins = Math.round(duration/(1000*60));
+        let secs = Math.round(duration/(1000));
+        if(secs < 60){
+            duration = `Total Duration is ${secs} secs`;
+        } else if(mins < 60){
+            duration = `Total Duration is ${mins} mins`;
+        } else {
+            duration = `Total Duration is ${hrs} hrs`;
+        }
         res.send({duration});
     })
     .catch(err => console.log(err));
