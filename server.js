@@ -50,14 +50,67 @@ app.get('/totalDur/:id',(req,res) =>{
     })
 })
 
+function uniq(a) {
+    var seen = {};
+    return a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+}
+
 app.get('/totalUsers/:id',(req,res) =>{
-    Book.find({_id:req.params.id})
-    .then(books =>{
-        
+    Book.findOne({_id:req.params.id})
+    .then(book =>{
+        let arr = [];
+        ReadingLog.find({book})
+        .then(logs =>{
+            logs.forEach(log =>{
+                if(log.event_type !== "start"){
+                    arr.push(log.user);
+                }
+            })
+            arr = uniq(arr);
+            res.send(`There are ${arr.length} user for the book ${book.name}`);
+        })
+        .catch(err => console.log(err));
     })
     .catch(err =>{
         console.log(err);
     })
+})
+
+// Enter day in numbers 1-7
+app.get('/givenDay/:day',(req,res) =>{
+    ReadingLog.find()
+    .then(async (logs) =>{
+        let duration = 0;
+        let users = [];
+        logs.forEach(log => users.push(log.user));
+        users = uniq(users);
+        await users.forEach(async (user) =>{
+            let start = 0,end = 0;
+            await ReadingLog.find({user})
+            .then(logs =>{
+                logs.forEach(log =>{
+                    if(log.event_type === "start"){
+                        start = log.timeStamp;
+                        console.log(`start found = ${start}`);
+                    } else {
+                        end = log.timeStamp;
+                        console.log(`end found = ${end}`);
+                    }
+                    if(start && end){
+                        console.log("start and end");
+                        duration += (end-start);
+                        console.log(duration);
+                        start = 0;
+                        end = 0;
+                    }    
+                })
+            })
+        })
+        res.send({duration});
+    })
+    .catch(err => console.log(err));
 })
 
 app.post('/addUser',(req,res) =>{
