@@ -99,25 +99,29 @@ app.get('/givenDay/:day',(req,res) =>{
             users.forEach(async (user,index) =>{
                 let start = 0,end = 0;
                 await ReadingLog.find({user})
-                .then(logs =>{
-                    logs.forEach(log =>{
-                        if(log.timeStamp.getDay() === parseInt(req.params.day)){
-                            if(log.event_type === "start"){
-                                start = log.timeStamp;
-                                console.log(`start found = ${start}`);
-                            } else {
-                                end = log.timeStamp;
-                                console.log(`end found = ${end}`);
+                .then(async (logs) =>{
+                    let prom2 = new Promise((resolve,reject) =>{
+                        logs.forEach((log,index) =>{
+                            if(log.timeStamp.getDay() === parseInt(req.params.day)){
+                                if(log.event_type === "start"){
+                                    start = log.timeStamp;
+                                    console.log(`start found = ${start}`);
+                                } else {
+                                    end = log.timeStamp;
+                                    console.log(`end found = ${end}`);
+                                }
+                                if(start && end){
+                                    console.log("start and end");
+                                    duration += (end-start);
+                                    console.log(duration);
+                                    start = 0;
+                                    end = 0;
+                                }    
                             }
-                            if(start && end){
-                                console.log("start and end");
-                                duration += (end-start);
-                                console.log(duration);
-                                start = 0;
-                                end = 0;
-                            }    
-                        }
+                            if(index === logs.length - 1) return resolve();
+                        })
                     })
+                    await prom2;
                     if(index === users.length-1){
                         return resolve();
                     }
