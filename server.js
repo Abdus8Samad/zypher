@@ -69,7 +69,8 @@ app.get('/totalUsers/:id',(req,res) =>{
                 }
             })
             arr = uniq(arr);
-            res.send(`There are ${arr.length} user for the book ${book.name}`);
+            console.log(arr);
+            res.send(`There are ${arr.length} users who've finished the book ${book.name}`);
         })
         .catch(err => console.log(err));
     })
