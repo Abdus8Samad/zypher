@@ -118,10 +118,10 @@ app.get('/givenDay/:day',(req,res) =>{
                             }    
                         }
                     })
+                    if(index === users.length-1){
+                        return resolve();
+                    }
                 })
-                if(index === users.length-1){
-                    return resolve();
-                }
             })    
         })
         await prom;
